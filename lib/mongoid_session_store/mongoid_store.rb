@@ -4,10 +4,8 @@ module ActionDispatch
 
       class Session
         include Mongoid::Document
-        
-        store_in :sessions
 
-        identity :type => String
+        store_in collection: :sessions
 
         field :data, :type => String, :default => [Marshal.dump({})].pack("m*")
       end
@@ -15,7 +13,7 @@ module ActionDispatch
       # The class used for session storage.
       cattr_accessor :session_class
       self.session_class = Session
-      
+
       SESSION_RECORD_KEY = 'rack.session.record'
       ENV_SESSION_OPTIONS_KEY = Rack::Session::Abstract::ENV_SESSION_OPTIONS_KEY if ::Rails.version >= "3.1"
 
@@ -47,11 +45,11 @@ module ActionDispatch
         #     find_session(sid).destroy
         #   end
         # end
-        
+
         def destroy(env)
           destroy_session(env, current_session_id(env), {})
         end
-        
+
         def destroy_session(env, session_id, options)
           if sid = current_session_id(env)
             get_session_model(env, sid).destroy
